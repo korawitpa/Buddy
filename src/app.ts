@@ -7,11 +7,17 @@ export class App {
 
     constructor(private port: number) {
         this.app = express()
+        this.middlewares()
         this.routes()
+        
     }
 
     routes() {
         this.app.use(Routes)
+    }
+
+    middlewares() {
+        this.app.use(express.json())
     }
 
     async listen() {
