@@ -1,7 +1,13 @@
 export interface INote {
-    ID?:string,
-    Title:string,
-    Content:string,
-    CreateAt?:Date,
-    Tag?:string
+    title:string,
+    content:string,
+    createdAt?:Date,
+}
+export interface ISort {
+    header: string,
+    direction: string
+}
+export interface INoteTag {
+    noteID: number,
+    tagID: number
 }
