@@ -1,40 +1,24 @@
 import { Request, Response } from 'express'
-import {connectDatabase} from '../database'
+import { Database } from '../database'
 
-import { newNote } from '../interface/post'
+import { INote } from '../interface/post'
 
-export  const getNote = (req: Request, res: Response) => {
-    connectDatabase().connect((err, result) => {
-        if (err) return res.json(err)
-        else {
-            const select = connectDatabase().query("SELECT * FROM node", (err, result)=>{
-                connectDatabase().end()  // Disconnect database
-                if (err){
-                    return res.json(err)
-                }
-                else{
-                    return res.json(result)
-                }
-            })
-        }
-    })
+// INIT DATABASE
+const database = new Database()
+
+
+export  const getNote = async (req: Request, res: Response) => {
+    let [result_status, result_msg] = await database.getNote(req.params.noteId)
+    if (!result_status){
+        return res.status(403).json({error: result_msg})
+    }
+    return res.json({msg: result_msg})
 }
 
-export const createNote = (req: Request, res: Response) => {
-    const newNote: newNote = req.body
-    newNote.CreateAt = new Date
-    connectDatabase().connect((err, result) => {
-        if (err) return res.json(err)
-        else {
-            const select = connectDatabase().query("INSERT INTO node SET ?", [newNote], (err, result)=>{
-                connectDatabase().end()  // Disconnect database
-                if (err){
-                    return res.json(err)
-                }
-                else{
-                    return res.json({message: 'Create new note success'})
-                }
-            })
-        }
-    })
+export const createNote = async (req: Request, res: Response) => {
+    let [result_status, result_msg] = await database.createNote(req.body)
+    if (!result_status){
+        return res.status(403).json({error: result_msg})
+    }
+    return res.json({msg: result_msg})
 }
