@@ -1,3 +1,4 @@
+import { query } from 'express'
 import { createPool } from 'mysql'
 import { INote, ISort, INoteTag } from './interface/post'
 
@@ -135,26 +136,58 @@ export class Database {
                 if (err) resolve([false, err])
                 else {
                     // CHECK IS THERE DATA BY NOTE ID
-                    let select = this.connection.query("SELECT * FROM note WHERE NoteID=?", [note_id], (err, result)=>{
+                    let select = this.connection.query("SELECT * FROM note WHERE noteID=?", [note_id], (err, result)=>{
                         if (err){
                             this.connection.releaseConnection(connection)  // Disconnect database
                             resolve([false, err])
                         }
                         else{
-                            // IF THERE IS NO DATA
+                            // IF THERE IS NO NOTE DATA
                             if (!result.length){
                                 this.connection.releaseConnection(connection)  // Disconnect database
                                 resolve([false, 'Not found exitting note please check'])
                             }
                             else{
-                                // DELETE NOTE
-                                select = this.connection.query("DELETE FROM note WHERE noteID=?", [note_id], (err, result)=>{
-                                    this.connection.releaseConnection(connection)  // Disconnect database
+                                // CHECK IS THERE note_tags
+                                select = this.connection.query("SELECT * FROM note_tags WHERE noteID=?", [note_id], (err, result)=>{
                                     if (err){
+                                        this.connection.releaseConnection(connection)  // Disconnect database
                                         resolve([false, err])
                                     }
                                     else{
-                                        resolve([true, 'Delete note success'])
+                                        if (result.length > 0) {
+                                            // DELETE note_tags
+                                            select = this.connection.query("DELETE FROM note_tags WHERE noteID=?", [note_id], (err, result)=>{
+                                                if (err){
+                                                    this.connection.releaseConnection(connection)  // Disconnect database
+                                                    resolve([false, err])
+                                                }
+                                                else{
+                                                    // DELETE NOTE
+                                                    select = this.connection.query("DELETE FROM note WHERE noteID=?", [note_id], (err, result)=>{
+                                                        this.connection.releaseConnection(connection)  // Disconnect database
+                                                        if (err){
+                                                            resolve([false, err])
+                                                        }
+                                                        else{
+                                                            resolve([true, 'Delete note success'])
+                                                        }
+                                                    })
+                                                }
+                                            })
+                                        }
+                                        else {
+                                            // DELETE NOTE
+                                            select = this.connection.query("DELETE FROM note WHERE noteID=?", [note_id], (err, result)=>{
+                                                this.connection.releaseConnection(connection)  // Disconnect database
+                                                if (err){
+                                                    resolve([false, err])
+                                                }
+                                                else{
+                                                    resolve([true, 'Delete note success'])
+                                                }
+                                            })
+                                        }
                                     }
                                 })
                             }
@@ -227,7 +260,7 @@ export class Database {
                                     }
                                     else{
                                         if (result.length){
-                                            // MAP NOTE-TAG ==>> CHECK EXITTING DATA
+                                            // MAP note_tags ==>> CHECK EXITTING DATA
                                             select = this.connection.query(`SELECT * FROM note_tags WHERE noteID='${note_tag.noteID}' AND tagID='${note_tag.tagID}'`, (err, result) => {
                                                 if (err){
                                                     this.connection.releaseConnection(connection)  // Disconnect database
@@ -248,7 +281,7 @@ export class Database {
                                                     }
                                                     else {
                                                         this.connection.releaseConnection(connection)  // Disconnect database
-                                                        resolve([false, 'Found exitting note-tag please check'])
+                                                        resolve([false, 'Found exitting note_tags please check'])
                                                     }
                                                 }
                                             })
@@ -263,6 +296,42 @@ export class Database {
                             {
                                 this.connection.releaseConnection(connection)  // Disconnect database
                                 resolve([false, 'Not found Note please check'])
+                            }
+                        }
+                    })
+                }
+            })
+        })
+    }
+
+    public deleteNoteTag = (noteID:string, tagID:string): Promise<[boolean, any]> => {
+        return new Promise((resolve) => {
+            this.connection.getConnection((err, connection) => {
+                if (err) resolve([false, err])
+                else {
+                    // CHECK IS THERE DATA
+                    let select = this.connection.query("SELECT * FROM note_tags WHERE NoteID=? AND TagID=?", [noteID, tagID], (err, result)=>{
+                        if (err){
+                            this.connection.releaseConnection(connection)  // Disconnect database
+                            resolve([false, err])
+                        }
+                        else{
+                            // IF THERE IS NO DATA
+                            if (!result.length){
+                                this.connection.releaseConnection(connection)  // Disconnect database
+                                resolve([false, 'Not found exitting note_tags please check'])
+                            }
+                            else{
+                                // DELETE note_tags
+                                select = this.connection.query("DELETE FROM note_tags WHERE NoteID=? AND TagID=?", [noteID, tagID], (err, result)=>{
+                                    this.connection.releaseConnection(connection)  // Disconnect database
+                                    if (err){
+                                        resolve([false, err])
+                                    }
+                                    else{
+                                        resolve([true, 'Delete note_tags success'])
+                                    }
+                                })
                             }
                         }
                     })

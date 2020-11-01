@@ -6,7 +6,7 @@ import { INote, INoteTag } from '../interface/post'
 // INIT DATABASE
 const database = new Database()
 
-
+//#region Note
 export  const getNote = async (req: Request, res: Response) => {
     let [result_status, result_msg] = await database.getNote(req.query)
     if (!result_status){
@@ -72,7 +72,9 @@ export const deleteNote = async (req: Request, res: Response) => {
 
     return res.json({msg: 'Delete Note success'})
 }
+//#endregion
 
+//#region Tag
 export const getTags = async (req: Request, res: Response) => {
     let [result_status, result_msg] = await database.getTags(req.query)
     if (!result_status){
@@ -105,6 +107,7 @@ export const createTags = async (req: Request, res: Response) => {
     }
     return res.status(403).json({error: 'Duplicate tag plaes check'})
 }
+//#endregion
 
 export const mapNoteTage = async (req: Request, res: Response) => {
     // CHECK DATA
