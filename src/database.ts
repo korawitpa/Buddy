@@ -92,6 +92,26 @@ export class Database {
         })
     }
 
+    public editNote = (note_id: string, note_detail: INote): Promise<[boolean, any]> => {
+        return new Promise((resolve) => {
+            let editNote:INote = note_detail
+            this.connection.getConnection((err, connection) => {
+                if (err) resolve([false, err])
+                else {
+                    const select = this.connection.query("UPDATE note SET ? WHERE noteID=?", [editNote, note_id], (err, result)=>{
+                        this.connection.releaseConnection(connection)  // Disconnect database
+                        if (err){
+                            resolve([false, err])
+                        }
+                        else{
+                            resolve([true, 'Create edit note success'])
+                        }
+                    })
+                }
+            })
+        })
+    }
+
     public getTags = (tag?: any): Promise<[boolean, any]> => {
         return new Promise((resolve) => {
             this.connection.getConnection((err, connection)=> {

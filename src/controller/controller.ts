@@ -35,6 +35,28 @@ export const createNote = async (req: Request, res: Response) => {
     return res.json({msg: 'Create Note success'})
 }
 
+export const editNote = async (req: Request, res: Response) => {
+    // Check data
+    if (!req.body.id) return res.status(404).json({error: 'not found >> id << please check'})
+    else if (!req.body.title) return res.status(404).json({error: 'not found >> title << please check'})
+    else if (!req.body.content) return res.status(404).json({error: 'not found >> content << please check'})
+
+    // Filter data
+    let editNoteData: INote = {
+        title: req.body.title,
+        content: req.body.content
+    }
+    let editNoteID: string = req.body.id
+
+    // CREATE NOTE
+    let [result_status, result_msg] = await database.editNote(editNoteID, editNoteData)
+    if (!result_status){
+        return res.status(403).json({error: result_msg})
+    }
+
+    return res.json({msg: 'Edit Note success'})
+}
+
 export const getTags = async (req: Request, res: Response) => {
     let [result_status, result_msg] = await database.getTags(req.query)
     if (!result_status){

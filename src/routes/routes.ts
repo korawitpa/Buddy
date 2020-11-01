@@ -1,11 +1,12 @@
 import { Router } from 'express'
-import { getNote, createNote, getTags, mapNoteTage, createTags } from '../controller/controller'
+import { getNote, createNote, getTags, mapNoteTage, createTags, editNote } from '../controller/controller'
 
 const router = Router()
 
 router.route('/')
     .get(getNote)
     .post(createNote)
+    .put(editNote)
 
 router.route('/tags')
     .get(getTags)
