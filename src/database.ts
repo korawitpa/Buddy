@@ -1,6 +1,5 @@
-import { query } from 'express'
 import { createPool } from 'mysql'
-import { INote, ISort, INoteTag } from './interface/post'
+import { INote, INoteTag } from './interface/post'
 
 export class Database {
     constructor() {}

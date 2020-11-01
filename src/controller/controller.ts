@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import { Database } from '../database'
 
-import { INote, INoteTag } from '../interface/post'
+import { INote } from '../interface/post'
 
 // INIT DATABASE
 const database = new Database()
