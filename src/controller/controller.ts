@@ -127,8 +127,6 @@ export const createTags = async (req: Request, res: Response) => {
     return res.status(403).json({error: 'Duplicate tag plaes check'})
 }
 
-
-
 export const deleteTags = async (req: Request, res: Response) => {
     // Check data
     if (!req.query.name) return res.status(404).json({error: 'not found >> name << please check'})
@@ -146,6 +144,7 @@ export const deleteTags = async (req: Request, res: Response) => {
 }
 //#endregion
 
+// Add tag to note
 export const mapNoteTage = async (req: Request, res: Response) => {
     // CHECK DATA
     if (!req.body.noteID) return res.status(404).json({error: 'not found noteID please check'})
@@ -155,5 +154,24 @@ export const mapNoteTage = async (req: Request, res: Response) => {
     if (!result_status){
         return res.status(403).json({error: result_msg})
     }
+    return res.json({msg: result_msg})
+}
+
+// Remove tag from note
+export const deleteNoteTags = async (req: Request, res: Response) => {
+    // Check data
+    if (!req.query.noteID) return res.status(404).json({error: 'not found >> noteID << please check'})
+    else if (!req.query.tagID) return res.status(404).json({error: 'not found >> tagID << please check'})
+
+    // Filter data
+    let noteID: string = req.query.noteID.toString()
+    let tagID: string = req.query.tagID.toString()
+
+    // DELETE NOTE-TAGS
+    let [result_status, result_msg] = await database.deleteNoteTag(noteID, tagID)
+    if (!result_status){
+        return res.status(403).json({error: result_msg})
+    }
+
     return res.json({msg: result_msg})
 }

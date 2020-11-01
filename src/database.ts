@@ -428,7 +428,7 @@ export class Database {
                 if (err) resolve([false, err])
                 else {
                     // CHECK IS THERE DATA
-                    let select = this.connection.query("SELECT * FROM note_tags WHERE noteID=? AND TagID=?", [noteID, tagID], (err, result)=>{
+                    let select = this.connection.query("SELECT * FROM note_tags WHERE noteID=? AND tagID=?", [noteID, tagID], (err, result)=>{
                         if (err){
                             this.connection.releaseConnection(connection)  // Disconnect database
                             resolve([false, err])
@@ -437,17 +437,17 @@ export class Database {
                             // IF THERE IS NO DATA
                             if (!result.length){
                                 this.connection.releaseConnection(connection)  // Disconnect database
-                                resolve([false, 'Not found exitting note_tags please check'])
+                                resolve([false, 'Not found exitting note-tags please check'])
                             }
                             else{
                                 // DELETE note_tags
-                                select = this.connection.query("DELETE FROM note_tags WHERE noteID=? AND TagID=?", [noteID, tagID], (err, result)=>{
+                                select = this.connection.query("DELETE FROM note_tags WHERE noteID=? AND tagID=?", [noteID, tagID], (err, result)=>{
                                     this.connection.releaseConnection(connection)  // Disconnect database
                                     if (err){
                                         resolve([false, err])
                                     }
                                     else{
-                                        resolve([true, 'Delete note_tags success'])
+                                        resolve([true, 'Delete note-tags success'])
                                     }
                                 })
                             }
