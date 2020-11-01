@@ -57,6 +57,22 @@ export const editNote = async (req: Request, res: Response) => {
     return res.json({msg: 'Edit Note success'})
 }
 
+export const deleteNote = async (req: Request, res: Response) => {
+    // Check data
+    if (!req.query.id) return res.status(404).json({error: 'not found >> id << please check'})
+
+    // Filter data
+    let deleteNoteID: string = req.query.id.toString()
+
+    // DELETE NOTE
+    let [result_status, result_msg] = await database.deleteNote(deleteNoteID)
+    if (!result_status){
+        return res.status(403).json({error: result_msg})
+    }
+
+    return res.json({msg: 'Delete Note success'})
+}
+
 export const getTags = async (req: Request, res: Response) => {
     let [result_status, result_msg] = await database.getTags(req.query)
     if (!result_status){

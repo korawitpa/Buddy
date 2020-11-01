@@ -98,13 +98,66 @@ export class Database {
             this.connection.getConnection((err, connection) => {
                 if (err) resolve([false, err])
                 else {
-                    const select = this.connection.query("UPDATE note SET ? WHERE noteID=?", [editNote, note_id], (err, result)=>{
-                        this.connection.releaseConnection(connection)  // Disconnect database
+                    // CHECK IS THERE DATA BY NOTE ID
+                    let select = this.connection.query("SELECT * FROM note WHERE NoteID=?", [note_id], (err, result)=>{
                         if (err){
+                            this.connection.releaseConnection(connection)  // Disconnect database
                             resolve([false, err])
                         }
                         else{
-                            resolve([true, 'Create edit note success'])
+                            // IF THERE IS NO DATA
+                            if (!result.length){
+                                this.connection.releaseConnection(connection)  // Disconnect database
+                                resolve([false, 'Not found exitting note please check'])
+                            }
+                            else{
+                                // UPDATE NOTE
+                                select = this.connection.query("UPDATE note SET ? WHERE noteID=?", [editNote, note_id], (err, result)=>{
+                                    this.connection.releaseConnection(connection)  // Disconnect database
+                                    if (err){
+                                        resolve([false, err])
+                                    }
+                                    else{
+                                        resolve([true, 'Create edit note success'])
+                                    }
+                                })
+                            }
+                        }
+                    })
+                }
+            })
+        })
+    }
+
+    public deleteNote = (note_id: string): Promise<[boolean, any]> => {
+        return new Promise((resolve) => {
+            this.connection.getConnection((err, connection) => {
+                if (err) resolve([false, err])
+                else {
+                    // CHECK IS THERE DATA BY NOTE ID
+                    let select = this.connection.query("SELECT * FROM note WHERE NoteID=?", [note_id], (err, result)=>{
+                        if (err){
+                            this.connection.releaseConnection(connection)  // Disconnect database
+                            resolve([false, err])
+                        }
+                        else{
+                            // IF THERE IS NO DATA
+                            if (!result.length){
+                                this.connection.releaseConnection(connection)  // Disconnect database
+                                resolve([false, 'Not found exitting note please check'])
+                            }
+                            else{
+                                // DELETE NOTE
+                                select = this.connection.query("DELETE FROM note WHERE noteID=?", [note_id], (err, result)=>{
+                                    this.connection.releaseConnection(connection)  // Disconnect database
+                                    if (err){
+                                        resolve([false, err])
+                                    }
+                                    else{
+                                        resolve([true, 'Delete note success'])
+                                    }
+                                })
+                            }
                         }
                     })
                 }
