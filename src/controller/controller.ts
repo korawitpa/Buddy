@@ -83,6 +83,25 @@ export const getTags = async (req: Request, res: Response) => {
     return res.json({msg: result_msg})
 }
 
+export const editTags = async (req: Request, res: Response) => {
+    // Check data
+    if (!req.body.name) return res.status(404).json({error: 'not found >> name << please check'})
+    else if (!req.body.new_name) return res.status(404).json({error: 'not found >> new name << please check'})
+
+    // Filter data
+    let editTagsData = {
+        name: req.body.new_name,
+    }
+
+    // CREATE NOTE
+    let [result_status, result_msg] = await database.editTags(req.body.name, editTagsData)
+    if (!result_status){
+        return res.status(403).json({error: result_msg})
+    }
+
+    return res.json({msg: 'Edit Tags success'})
+}
+
 export const createTags = async (req: Request, res: Response) => {
     // Check data
     if (!req.body.name) return res.status(404).json({error: 'not found >> name << please check'})
@@ -107,6 +126,8 @@ export const createTags = async (req: Request, res: Response) => {
     }
     return res.status(403).json({error: 'Duplicate tag plaes check'})
 }
+
+
 
 export const deleteTags = async (req: Request, res: Response) => {
     // Check data

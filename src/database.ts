@@ -100,7 +100,7 @@ export class Database {
                 if (err) resolve([false, err])
                 else {
                     // CHECK IS THERE DATA BY NOTE ID
-                    let select = this.connection.query("SELECT * FROM note WHERE NoteID=?", [note_id], (err, result)=>{
+                    let select = this.connection.query("SELECT * FROM note WHERE noteID=?", [note_id], (err, result)=>{
                         if (err){
                             this.connection.releaseConnection(connection)  // Disconnect database
                             resolve([false, err])
@@ -231,6 +231,57 @@ export class Database {
                         }
                         else{
                             resolve([true, 'Create new tag success'])
+                        }
+                    })
+                }
+            })
+        })
+    }
+
+    public editTags = (tag_name: string, new_tag_name: any): Promise<[boolean, any]> => {
+        return new Promise((resolve) => {
+            this.connection.getConnection((err, connection) => {
+                if (err) resolve([false, err])
+                else {
+                    // CHECK IS THERE DATA BY TAGS NAME
+                    let select = this.connection.query("SELECT * FROM tags WHERE name=?", [tag_name], (err, result)=>{
+                        if (err){
+                            this.connection.releaseConnection(connection)  // Disconnect database
+                            resolve([false, err])
+                        }
+                        else{
+                            // IF THERE IS NO DATA
+                            if (!result.length){
+                                this.connection.releaseConnection(connection)  // Disconnect database
+                                resolve([false, 'Not found exitting tags please check'])
+                            }
+                            else{
+                                // CHECK DUPLICATE TAGS
+                                select = this.connection.query("SELECT * FROM tags WHERE name=?", [new_tag_name.name], (err, result)=>{
+                                    if (err){
+                                        this.connection.releaseConnection(connection)  // Disconnect database
+                                        resolve([false, err])
+                                    }
+                                    else {
+                                        if (result.length > 0) {
+                                            this.connection.releaseConnection(connection)  // Disconnect database
+                                            resolve([false, 'Duplicate tags do not use this new tags'])
+                                        }
+                                        else{
+                                            // UPDATE TAGS
+                                            select = this.connection.query("UPDATE tags SET ? WHERE name=?", [new_tag_name, tag_name], (err, result)=>{
+                                                this.connection.releaseConnection(connection)  // Disconnect database
+                                                if (err){
+                                                    resolve([false, err])
+                                                }
+                                                else{
+                                                    resolve([true, 'Edit tags success'])
+                                                }
+                                            })
+                                        }
+                                    }
+                                })
+                            }
                         }
                     })
                 }
@@ -377,7 +428,7 @@ export class Database {
                 if (err) resolve([false, err])
                 else {
                     // CHECK IS THERE DATA
-                    let select = this.connection.query("SELECT * FROM note_tags WHERE NoteID=? AND TagID=?", [noteID, tagID], (err, result)=>{
+                    let select = this.connection.query("SELECT * FROM note_tags WHERE noteID=? AND TagID=?", [noteID, tagID], (err, result)=>{
                         if (err){
                             this.connection.releaseConnection(connection)  // Disconnect database
                             resolve([false, err])
@@ -390,7 +441,7 @@ export class Database {
                             }
                             else{
                                 // DELETE note_tags
-                                select = this.connection.query("DELETE FROM note_tags WHERE NoteID=? AND TagID=?", [noteID, tagID], (err, result)=>{
+                                select = this.connection.query("DELETE FROM note_tags WHERE noteID=? AND TagID=?", [noteID, tagID], (err, result)=>{
                                     this.connection.releaseConnection(connection)  // Disconnect database
                                     if (err){
                                         resolve([false, err])
