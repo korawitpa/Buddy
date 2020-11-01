@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { getNote, createNote, getTags, mapNoteTage, createTags, editNote, deleteNote } from '../controller/controller'
+import { getNote, createNote, getTags, mapNoteTage, createTags, editNote, deleteNote, deleteTags } from '../controller/controller'
 
 const router = Router()
 
@@ -12,6 +12,7 @@ router.route('/')
 router.route('/tags')
     .get(getTags)
     .post(createTags)
+    .delete(deleteTags)
 
 router.route('/map')
     .put(mapNoteTage)

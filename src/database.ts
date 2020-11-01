@@ -238,6 +238,73 @@ export class Database {
         })
     }
 
+    public deleteTags = (tag_name: string): Promise<[boolean, any]> => {
+        return new Promise((resolve) => {
+            this.connection.getConnection((err, connection)=> {
+                if (err) resolve([false, err])
+                else {
+                    // CHECK IS THERE EXITTING TAG
+                    let select = this.connection.query("SELECT * FROM tags WHERE name=?", [tag_name], (err, result) => {
+                        if (err){
+                            this.connection.releaseConnection(connection)  // Disconnect database
+                            resolve([false, err])
+                        }
+                        else{
+                            // IF THERE IS EXITTING TAG
+                            if (result.length > 0){
+                                let tag_id = result[0].tagID
+                                // CHECK IS THERE note_tags
+                                select = this.connection.query("SELECT * FROM note_tags WHERE tagID=?", [tag_id], (err, result) => {
+                                    if (err){
+                                        this.connection.releaseConnection(connection)  // Disconnect database
+                                        resolve([false, err])
+                                    }
+                                    else {
+                                        // IF THERE IS EXITTING note_tags
+                                        if (result.length > 0) {
+                                            // DELETE note_tags
+                                            select = this.connection.query("DELETE FROM note_tags WHERE tagID=?", [tag_id], (err, result)=>{
+                                                if (err){
+                                                    this.connection.releaseConnection(connection)  // Disconnect database
+                                                    resolve([false, err])
+                                                }
+                                                else{
+                                                    // DELELTE TAGS
+                                                    select = this.connection.query("DELETE FROM tags WHERE tagID=?", [tag_id], (err, result)=>{
+                                                        this.connection.releaseConnection(connection)  // Disconnect database
+                                                        if (err){
+                                                            resolve([false, err])
+                                                        }
+                                                        else{
+                                                            resolve([false, 'Delete tags success'])
+                                                        }
+                                                    })
+                                                }
+                                            })
+                                        }
+                                        select = this.connection.query("DELETE FROM tags WHERE tagID=?", [tag_id], (err, result)=>{
+                                            this.connection.releaseConnection(connection)  // Disconnect database
+                                            if (err){
+                                                resolve([false, err])
+                                            }
+                                            else{
+                                                resolve([false, 'Delete tags success'])
+                                            }
+                                        })
+                                    }
+                                })
+                            }
+                            else {
+                                this.connection.releaseConnection(connection)  // Disconnect database
+                                resolve([false, 'Not found tags please check'])
+                            }
+                        }
+                    })
+                }
+            })
+        })
+    }
+
     public mapNoteTag = (note_tag: INoteTag): Promise<[boolean, any]> => {
         return new Promise((resolve) => {
 
